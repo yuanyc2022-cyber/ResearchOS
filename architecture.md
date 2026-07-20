@@ -2,33 +2,58 @@
 
 ## Overview
 
-ResearchOS adopts a modular workflow architecture. Each component handles a specific research activity while a planning layer coordinates interactions.
+ResearchOS uses a modular workflow architecture. Each module performs a specialized function while a coordination layer manages task execution.
 
-## Components
+## Modules
 
-### Research Planner
-Responsible for task decomposition and workflow coordination.
+### Workflow Planner
 
-### Literature Agent
-Organizes related studies and research directions.
+Responsible for:
+- task decomposition
+- workflow coordination
+- output integration
 
-### Theory Agent
-Develops analytical frameworks and assumptions.
 
-### Coding Agent
-Supports computational validation and visualization.
+### Discovery Module
 
-### Review Agent
-Evaluates research outputs and identifies limitations.
+Responsible for:
+- information organization
+- knowledge extraction
+- opportunity identification
 
-## Data Flow
+
+### Analysis Module
+
+Responsible for:
+- framework construction
+- structured reasoning
+- analytical development
+
+
+### Validation Module
+
+Responsible for:
+- computational experiments
+- numerical evaluation
+- result verification
+
+
+### Review Module
+
+Responsible for:
+- quality assessment
+- limitation identification
+- improvement suggestions
+
+
+## Workflow
 
 ```
-Research Goal
-      |
-Planning Layer
-      |
-Specialized Agents
-      |
-Integrated Research Package
+Objective
+   |
+Planner
+   |
+Specialized Modules
+   |
+Integrated Result
 ```
