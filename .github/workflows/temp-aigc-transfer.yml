@@ -1,0 +1,38 @@
+name: Temporary AIGC figure transfer
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  transfer:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Download Mathematica PDFs
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p out
+          base='https://filebin.net/oai_aigc_numerical_rebuild_20260902_final'
+          cookie='verified=2024-05-24'
+          for f in \
+            Fig03_Market_Outcomes_Mathematica.pdf \
+            Fig04_Human_Profit_Sensitivity_Mathematica.pdf \
+            Fig05_Revenue_Decomposition_Mathematica.pdf \
+            Fig06_Platform_Control_Sensitivity_Mathematica.pdf \
+            Fig07_Stakeholder_Misalignment_Mathematica.pdf; do
+            curl --fail --location --retry 3 --cookie "$cookie" "$base/$f" --output "out/$f"
+            test -s "out/$f"
+            file "out/$f" | grep -q 'PDF document'
+          done
+          sha256sum out/* > out/SHA256SUMS.txt
+      - name: Upload transfer artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: AIGC-Mathematica-Figures
+          path: out
+          if-no-files-found: error
+          retention-days: 1
