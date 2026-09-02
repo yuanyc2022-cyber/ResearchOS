@@ -1,0 +1,34 @@
+name: Temporary AIGC math-typeset figure transfer v2
+
+on:
+  push:
+    branches:
+      - tmp-aigc-mathlabels-final-20260902
+
+jobs:
+  transfer:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download final Mathematica PDFs
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifact
+          curl -L --fail --retry 4 -o artifact/Fig03_Market_Outcomes_Mathematica.pdf https://files.catbox.moe/ox1wou.pdf
+          curl -L --fail --retry 4 -o artifact/Fig04_Human_Profit_Sensitivity_Mathematica.pdf https://files.catbox.moe/gayp95.pdf
+          curl -L --fail --retry 4 -o artifact/Fig05_Revenue_Decomposition_Mathematica.pdf https://files.catbox.moe/t6otsq.pdf
+          curl -L --fail --retry 4 -o artifact/Fig06_Platform_Control_Sensitivity_Mathematica.pdf https://files.catbox.moe/p9sud4.pdf
+          curl -L --fail --retry 4 -o artifact/Fig07_Stakeholder_Misalignment_Mathematica.pdf https://files.catbox.moe/17y69s.pdf
+          test "$(stat -c%s artifact/Fig03_Market_Outcomes_Mathematica.pdf)" -gt 10000
+          test "$(stat -c%s artifact/Fig04_Human_Profit_Sensitivity_Mathematica.pdf)" -gt 10000
+          test "$(stat -c%s artifact/Fig05_Revenue_Decomposition_Mathematica.pdf)" -gt 10000
+          test "$(stat -c%s artifact/Fig06_Platform_Control_Sensitivity_Mathematica.pdf)" -gt 10000
+          test "$(stat -c%s artifact/Fig07_Stakeholder_Misalignment_Mathematica.pdf)" -gt 10000
+          sha256sum artifact/*
+      - name: Upload final artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: AIGC-MathTypeset-Figures-v2
+          path: artifact
+          if-no-files-found: error
+          retention-days: 1
