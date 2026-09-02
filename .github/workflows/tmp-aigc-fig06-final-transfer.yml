@@ -1,0 +1,26 @@
+name: Temporary AIGC Figure 6 final transfer
+
+on:
+  push:
+    branches:
+      - tmp-aigc-mathlabels-final-20260902
+
+jobs:
+  transfer:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download final Figure 6
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifact
+          curl -L --fail --retry 4 -o artifact/Fig06_Platform_Control_Sensitivity_Mathematica.pdf https://files.catbox.moe/mzrz03.pdf
+          test "$(stat -c%s artifact/Fig06_Platform_Control_Sensitivity_Mathematica.pdf)" -gt 10000
+          sha256sum artifact/*
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: AIGC-Fig06-Final
+          path: artifact
+          if-no-files-found: error
+          retention-days: 1
