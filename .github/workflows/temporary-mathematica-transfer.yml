@@ -17,21 +17,21 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          landing='https://tmpfiles.org/dl/wDwFs6Dvy8dG/dss_mathematica_figures.zip'
+          landing='https://tmpfiles.org/wowihSfdPx0A/dss_notation_clean_mathematica_figures.zip'
           curl --fail --location --retry 5 --retry-delay 2 --user-agent 'Mozilla/5.0' "$landing" -o landing.html
-          signed=$(grep -oE 'https://tmpfiles.org/dl/[^" ]+/wDwFs6Dvy8dG/dss_mathematica_figures.zip' landing.html | head -n 1)
+          signed=$(grep -oE 'https://tmpfiles.org/dl/[^" ]+/wowihSfdPx0A/dss_notation_clean_mathematica_figures.zip' landing.html | head -n 1)
           test -n "$signed"
-          curl --fail --location --retry 5 --retry-delay 2 --user-agent 'Mozilla/5.0' "$signed" -o DSS_Mathematica_Figures.zip
-          unzip -t DSS_Mathematica_Figures.zip
+          curl --fail --location --retry 5 --retry-delay 2 --user-agent 'Mozilla/5.0' "$signed" -o DSS_Notation_Clean_Mathematica_Figures.zip
+          unzip -t DSS_Notation_Clean_Mathematica_Figures.zip
           mkdir -p extracted
-          unzip -q DSS_Mathematica_Figures.zip -d extracted
+          unzip -q DSS_Notation_Clean_Mathematica_Figures.zip -d extracted
           ls -lah extracted
       - name: Upload Mathematica figure archive
         uses: actions/upload-artifact@v4
         with:
-          name: DSS-Mathematica-Figures
+          name: DSS-Notation-Clean-Mathematica-Figures
           path: |
-            DSS_Mathematica_Figures.zip
+            DSS_Notation_Clean_Mathematica_Figures.zip
             extracted/*.pdf
           if-no-files-found: error
           retention-days: 1
