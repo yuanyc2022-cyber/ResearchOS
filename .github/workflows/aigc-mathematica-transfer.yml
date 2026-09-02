@@ -1,0 +1,28 @@
+name: AIGC Mathematica Figure Transfer
+
+on:
+  push:
+    paths:
+      - '.github/workflows/aigc-mathematica-transfer.yml'
+  workflow_dispatch:
+
+jobs:
+  transfer:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Mathematica-exported figure archive
+        run: |
+          set -euo pipefail
+          curl -L --fail --retry 3 'https://files.catbox.moe/kyfjgz.zip' -o AIGC_Mathematica_Numerical_Figures_Final.zip
+          echo '20482478869514c23207cd10df1522aef7a8cb8018ce787796e42daedf2ed25b  AIGC_Mathematica_Numerical_Figures_Final.zip' | sha256sum -c -
+          unzip -t AIGC_Mathematica_Numerical_Figures_Final.zip
+          mkdir artifact
+          unzip -q AIGC_Mathematica_Numerical_Figures_Final.zip -d artifact
+          find artifact -type f -maxdepth 2 -print -exec file {} \;
+      - name: Upload transferred figures
+        uses: actions/upload-artifact@v4
+        with:
+          name: AIGC_Mathematica_Numerical_Figures_Final
+          path: artifact/
+          if-no-files-found: error
+          retention-days: 1
