@@ -13,25 +13,21 @@ jobs:
   transfer:
     runs-on: ubuntu-latest
     steps:
-      - name: Download Mathematica-generated figure archive
+      - name: Download corrected Mathematica Figure 5
         shell: bash
         run: |
           set -euo pipefail
-          landing='https://tmpfiles.org/wowihSfdPx0A/dss_notation_clean_mathematica_figures.zip'
+          landing='https://tmpfiles.org/wXwxh7gj3m6n/fig5_local_capability_path.pdf'
           curl --fail --location --retry 5 --retry-delay 2 --user-agent 'Mozilla/5.0' "$landing" -o landing.html
-          signed=$(grep -oE 'https://tmpfiles.org/dl/[^" ]+/wowihSfdPx0A/dss_notation_clean_mathematica_figures.zip' landing.html | head -n 1)
+          signed=$(grep -oE 'https://tmpfiles.org/dl/[^" ]+/wXwxh7gj3m6n/fig5_local_capability_path.pdf' landing.html | head -n 1)
           test -n "$signed"
-          curl --fail --location --retry 5 --retry-delay 2 --user-agent 'Mozilla/5.0' "$signed" -o DSS_Notation_Clean_Mathematica_Figures.zip
-          unzip -t DSS_Notation_Clean_Mathematica_Figures.zip
-          mkdir -p extracted
-          unzip -q DSS_Notation_Clean_Mathematica_Figures.zip -d extracted
-          ls -lah extracted
-      - name: Upload Mathematica figure archive
+          curl --fail --location --retry 5 --retry-delay 2 --user-agent 'Mozilla/5.0' "$signed" -o fig5.pdf
+          file fig5.pdf
+          test "$(head -c 4 fig5.pdf)" = '%PDF'
+      - name: Upload corrected Mathematica Figure 5
         uses: actions/upload-artifact@v4
         with:
-          name: DSS-Notation-Clean-Mathematica-Figures
-          path: |
-            DSS_Notation_Clean_Mathematica_Figures.zip
-            extracted/*.pdf
+          name: DSS-Corrected-Mathematica-Figure-5
+          path: fig5.pdf
           if-no-files-found: error
           retention-days: 1
