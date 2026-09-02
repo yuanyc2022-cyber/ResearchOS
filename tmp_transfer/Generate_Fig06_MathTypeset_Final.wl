@@ -1,0 +1,25 @@
+ClearAll["Global`*"];
+fontFamily="Times New Roman";
+navy=RGBColor[0.13,0.32,0.52]; amber=RGBColor[0.82,0.45,0.10]; midGray=GrayLevel[0.35]; gridGray=GrayLevel[0.90];
+baseStyle=Directive[FontFamily->fontFamily,FontSize->9,Black]; labelStyle=Directive[FontFamily->fontFamily,FontSize->10,Black]; panelStyle=Directive[FontFamily->fontFamily,FontSize->10,Bold,Black];
+common={Frame->True,Axes->False,FrameStyle->Directive[Black,AbsoluteThickness[0.8]],FrameTicks->{{Automatic,None},{Automatic,None}},FrameTicksStyle->baseStyle,LabelStyle->labelStyle,BaseStyle->baseStyle,PlotRangePadding->None,PlotRangeClipping->True,ImagePadding->{{50,8},{36,8}},AspectRatio->0.82,PlotPoints->240,MaxRecursion->5,Exclusions->None,PerformanceGoal->"Quality",GridLinesStyle->Directive[gridGray,AbsoluteThickness[0.45]],ImageSize->335};
+mathLabel[box_,size_:9,color_:Black]:=Style[RawBoxes[FormBox[box,TraditionalForm]],size,color,FontFamily->fontFamily];
+alphaBox="\[Alpha]";rhoBox="\[Rho]";alphaStarBox=SuperscriptBox[alphaBox,"*"];
+num3[x_]:=ToString[NumberForm[N[x],{4,3},NumberPadding->{"","0"}]];
+qLabel[x_]:=mathLabel[RowBox[{"q","/","t","=",num3[x]}],8.8];
+legendFun=(Framed[#,FrameStyle->GrayLevel[0.80],Background->White,RoundingRadius->0,FrameMargins->{{4,4},{1,1}}]&);
+pH[a_,q_,th_,t_:1]:=(((1-th)+a(th+3))q+(5-3a)t)/(5(1+a));
+pA[a_,q_,th_,t_:1]:=((2(th-1)+a(3th-1))q+(5+a)t)/(5(1+a));
+DH[a_,q_,th_,t_:1]:=(a+2)pH[a,q,th,t]/(6t);DA[a_,q_,th_,t_:1]:=(1-a)pA[a,q,th,t]/(3t);
+piH[a_,q_,th_,t_:1]:=pH[a,q,th,t]DH[a,q,th,t];piA[a_,q_,th_,t_:1]:=pA[a,q,th,t]DA[a,q,th,t];
+R[a_,q_,th_,t_:1]:=2piH[a,q,th,t]+piA[a,q,th,t];Rp[a_,q_,th_,t_:1]:=Evaluate[D[R[z,q,th,t],z]/.z->a];
+aStar[g_?NumericQ,q_?NumericQ,th_?NumericQ,rho_?NumericQ,k_?NumericQ,bar_?NumericQ,t_:1]:=Module[{lo=-rho Rp[0,q,th,t],hi=k bar-rho Rp[bar,q,th,t],root},Which[g<=lo,0.,g>=hi,N[bar],True,root=Quiet[a/.FindRoot[rho Rp[a,q,th,t]+g-k a==0,{a,N[bar/2,30]},WorkingPrecision->30,AccuracyGoal->16,PrecisionGoal->16]];Clip[N[root],{0.,N[bar]}]]];
+t=1;th=4/5;bar=1/2;k=3/4;qlo=7/4;qhi=203/100;rho0=1/5;g0=3/10;
+styles={Directive[amber,AbsoluteThickness[2.0],AbsoluteDashing[{5.0,2.2}]],Directive[navy,AbsoluteThickness[2.2]]};
+legend=Placed[LineLegend[styles,{qLabel[qlo],qLabel[qhi]},LegendMarkerSize->27,LegendLayout->"Row",LegendFunction->legendFun],Above];
+p1=Plot[Evaluate[{aStar[g,qlo,th,rho0,k,bar,t],aStar[g,qhi,th,rho0,k,bar,t]}],{g,0,23/50},Evaluate[Sequence@@common],PlotStyle->styles,PlotLegends->legend,PlotRange->{{0,23/50},{0,bar}},GridLines->{Range[0,.45,.1],Range[0,.5,.1]},FrameLabel->{mathLabel["g",10],mathLabel[alphaStarBox,10]},Epilog->{Directive[midGray,Dotted,AbsoluteThickness[.9]],Line[{{0,bar},{23/50,bar}}],Text[mathLabel[RowBox[{alphaStarBox,"=","0.5"}],8.6,midGray],{.385,.485}]}];
+p2=Plot[Evaluate[{aStar[g0,qlo,th,rho,k,bar,t],aStar[g0,qhi,th,rho,k,bar,t]}],{rho,0,1/2},Evaluate[Sequence@@common],PlotStyle->styles,PlotLegends->legend,PlotRange->{{0,1/2},{.18,.43}},GridLines->{Range[0,.5,.1],Range[.2,.4,.05]},FrameLabel->{mathLabel[rhoBox,10],mathLabel[alphaStarBox,10]}];
+fig=GraphicsGrid[{{p1,p2},{Style["(a) Sensitivity to the user-value benefit",panelStyle],Style["(b) Sensitivity to the commission rate",panelStyle]}},Spacings->{.10,.03},ImageSize->710];
+path=FileNameJoin[{$TemporaryDirectory,"Fig06_Platform_Control_Sensitivity_Mathematica.pdf"}];Export[path,fig,"PDF"];
+link=StringTrim@URLRead[HTTPRequest["https://catbox.moe/user/api.php",<|"Method"->"POST","Body"->{"reqtype"->"fileupload","fileToUpload"->File[path]}|>],"Body"];
+<|"url"->link,"bytes"->FileByteCount[path],"sha256"->FileHash[path,"SHA256","HexString"]|>
